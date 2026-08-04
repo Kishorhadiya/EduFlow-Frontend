@@ -22,6 +22,17 @@ import MySubmissions from './pages/student/MySubmissions';
 import StudentProfilePage from './pages/student/StudentProfilePage';
 import StudentSettingsPage from './pages/student/StudentSettingsPage';
 
+import { useContext } from 'react';
+import AuthContext from './context/AuthContext';
+
+const HomeRedirect = () => {
+  const { user } = useContext(AuthContext);
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role === 'teacher') return <Navigate to="/teacher/dashboard" replace />;
+  if (user.role === 'student') return <Navigate to="/student/dashboard" replace />;
+  return <Navigate to="/login" replace />;
+};
+
 function App() {
   return (
     <Router>
@@ -40,6 +51,7 @@ function App() {
               <Navbar />
               <main className="pt-32 pb-20">
                 <Routes>
+                  <Route path="/" element={<HomeRedirect />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
 

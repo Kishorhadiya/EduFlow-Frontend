@@ -50,13 +50,16 @@ const ListAssignments = () => {
         let result = allAssignments;
 
         if (selectedClass) {
-            result = result.filter(a => a.classId?._id === selectedClass);
+            result = result.filter(a => {
+                const id = typeof a.classId === 'object' ? a.classId?._id : a.classId;
+                return id === selectedClass;
+            });
         }
 
         if (searchQuery) {
             result = result.filter(a =>
                 a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                a.classId?.className.toLowerCase().includes(searchQuery.toLowerCase())
+                (typeof a.classId === 'object' && a.classId?.className?.toLowerCase().includes(searchQuery.toLowerCase()))
             );
         }
 

@@ -57,11 +57,16 @@ const ViewSubmissions = () => {
                 .then(res => res.json())
                 .then(data => {
                     setAssignments(data);
-                    setSelectedAssignment('');
-                    setSubmissions([]);
+                    const targetAssignmentId = location.state?.assignmentId;
+                    if (targetAssignmentId && data.some(a => a._id === targetAssignmentId)) {
+                        setSelectedAssignment(targetAssignmentId);
+                    } else if (selectedAssignment && !data.some(a => a._id === selectedAssignment)) {
+                        setSelectedAssignment('');
+                        setSubmissions([]);
+                    }
                 });
         }
-    }, [selectedClass, user.token, API_URL]);
+    }, [selectedClass, user.token, API_URL, location.state]);
 
     const fetchSubmissions = useCallback(() => {
         if (!selectedAssignment) return;
