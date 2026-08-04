@@ -46,7 +46,7 @@ const EditAssignment = () => {
                         title: data.title,
                         description: data.description,
                         dueDate: data.dueDate.split('T')[0],
-                        classId: data.classId
+                        classId: typeof data.classId === 'object' ? (data.classId?._id || '') : data.classId
                     });
                 }
             } catch (err) {

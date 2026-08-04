@@ -12,7 +12,8 @@ const PrivateRoute = ({ roles }) => {
     }
 
     if (roles && !roles.includes(user.role)) {
-        return <Navigate to="/" replace />;
+        const target = user.role === 'teacher' ? '/teacher/dashboard' : '/student/dashboard';
+        return <Navigate to={target} replace />;
     }
 
     return <Outlet />;
