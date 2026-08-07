@@ -8,4 +8,7 @@ export default defineConfig({
     tailwindcss(),
     react()
   ],
+  define: {
+    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL !== 'undefined' && process.env.VITE_API_URL ? process.env.VITE_API_URL : 'https://eduflow-backend.onrender.com/api')
+  }
 })
