@@ -24,7 +24,7 @@ const registerUser = async (req, res) => {
     }
 
     try {
-        const normalizedEmail = email.toLowerCase();
+        const normalizedEmail = email.trim().toLowerCase();
         const userExists = await User.findOne({ email: normalizedEmail });
 
         if (userExists) {
@@ -35,7 +35,7 @@ const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const user = await User.create({
-            name,
+            name: name.trim(),
             email: normalizedEmail,
             password: hashedPassword,
             role,
@@ -46,7 +46,7 @@ const registerUser = async (req, res) => {
             res.status(201).json({
                 _id: user._id,
                 name: user.name,
-                email: user.email.toLowerCase(),
+                email: user.email,
                 role: user.role,
                 classId: user.classId,
                 profilePicture: user.profilePicture,
@@ -71,13 +71,14 @@ const loginUser = async (req, res) => {
     }
 
     try {
-        const user = await User.findOne({ email: email.toLowerCase() });
+        const normalizedEmail = email.trim().toLowerCase();
+        const user = await User.findOne({ email: normalizedEmail });
 
         if (user && (await bcrypt.compare(password, user.password))) {
             res.json({
                 _id: user._id,
                 name: user.name,
-                email: user.email.toLowerCase(),
+                email: user.email,
                 role: user.role,
                 classId: user.classId,
                 profilePicture: user.profilePicture,
@@ -99,8 +100,8 @@ const updateProfile = async (req, res) => {
         const user = await User.findById(req.user._id);
 
         if (user) {
-            user.name = req.body.name || user.name;
-            const newEmail = req.body.email ? req.body.email.toLowerCase() : user.email;
+            user.name = req.body.name ? req.body.name.trim() : user.name;
+            const newEmail = req.body.email ? req.body.email.trim().toLowerCase() : user.email;
             user.profilePicture = req.body.profilePicture || user.profilePicture;
 
             if (req.body.email && newEmail !== user.email) {
@@ -116,7 +117,7 @@ const updateProfile = async (req, res) => {
             res.json({
                 _id: updatedUser._id,
                 name: updatedUser.name,
-                email: updatedUser.email.toLowerCase(),
+                email: updatedUser.email,
                 role: updatedUser.role,
                 classId: updatedUser.classId,
                 profilePicture: updatedUser.profilePicture,
