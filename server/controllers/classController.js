@@ -14,12 +14,22 @@ const createClass = async (req, res) => {
     }
 };
 
-// @desc    Get all classes
+// @desc    Get all classes (auto-creates a default class if none exist)
 // @route   GET /api/classes
-// @access  Public (or Private)
+// @access  Public
 const getClasses = async (req, res) => {
     try {
-        const classes = await Class.find({});
+        let classes = await Class.find({});
+
+        // Auto-create a default class if the database has no classes yet
+        if (classes.length === 0) {
+            const defaultClass = await Class.create({
+                className: 'General',
+                department: 'General Studies'
+            });
+            classes = [defaultClass];
+        }
+
         res.json(classes);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -57,9 +67,13 @@ const deleteClass = async (req, res) => {
             return res.status(404).json({ message: 'Class not found' });
         }
 
-        // Check if students are assigned
-        const students = await User.findOne({ classId: req.params.id });
-        if (students) {
+        // Check if any STUDENTS are assigned to this class
+        const assignedStudent = await User.findOne({
+            classId: req.params.id,
+            role: 'student'
+        });
+
+        if (assignedStudent) {
             return res.status(400).json({ message: 'Cannot delete class with assigned students' });
         }
 

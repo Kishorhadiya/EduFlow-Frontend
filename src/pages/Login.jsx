@@ -7,12 +7,19 @@ import {
     Mail,
     ArrowRight,
     GraduationCap,
-    KeyRound
+    KeyRound,
+    Eye,
+    EyeOff,
+    ShieldCheck,
+    BookOpen,
+    Users,
+    Star
 } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { login, user } = useContext(AuthContext);
     const { theme } = useContext(ThemeContext);
@@ -43,11 +50,15 @@ const Login = () => {
 
             if (res.ok) {
                 login(data);
+                const roleLabel = data.role === 'teacher' ? '👨‍🏫 Teacher' : '🎓 Student';
                 Swal.fire({
                     icon: 'success',
-                    title: 'Welcome Back!',
-                    text: 'Establishing secure link...',
-                    timer: 1500,
+                    title: `Welcome Back, ${data.name}!`,
+                    html: `<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;">
+                        <span style="background:${data.role === 'teacher' ? '#6366f1' : '#10b981'};color:#fff;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.05em;">${roleLabel}</span>
+                    </div>
+                    <p style="margin-top:10px;font-size:13px;color:#64748b;">Redirecting to your dashboard...</p>`,
+                    timer: 2000,
                     showConfirmButton: false,
                     background: theme === 'dark' ? '#0f172a' : '#fff',
                     color: theme === 'dark' ? '#f8fafc' : '#1e293b'
@@ -66,7 +77,7 @@ const Login = () => {
             Swal.fire({
                 icon: 'error',
                 title: 'System Offline',
-                text: 'Connection failed.',
+                text: 'Connection failed. Please try again.',
                 background: theme === 'dark' ? '#0f172a' : '#fff',
                 color: theme === 'dark' ? '#f8fafc' : '#1e293b'
             });
@@ -76,97 +87,150 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-950 relative overflow-hidden font-sans transition-colors duration-300">
+        <div className="min-h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-slate-950 transition-colors duration-300 font-sans p-4">
 
-            {/* Subtle Gradient Background */}
-            <div className="absolute inset-0 z-0">
-                <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-indigo-50/50 via-white to-blue-50/50 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900"></div>
-                <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-indigo-200/10 dark:bg-indigo-500/5 rounded-full blur-[100px] animate-pulse"></div>
-                <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-200/10 dark:bg-blue-500/5 rounded-full blur-[100px] animate-pulse"></div>
+            {/* Ambient Background */}
+            <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-indigo-400/10 dark:bg-indigo-600/8 rounded-full blur-[120px]" />
+                <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-violet-400/10 dark:bg-violet-600/8 rounded-full blur-[120px]" />
             </div>
 
-            <div className="relative z-10 w-full max-w-[400px] sm:max-w-[440px]">
-                {/* Branding */}
-                <div className="flex flex-col items-center mb-6 sm:mb-8">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-indigo-600 dark:bg-indigo-500 rounded-2xl flex items-center justify-center shadow-xl mb-3 sm:mb-4 group hover:scale-105 transition-transform duration-300 cursor-pointer">
-                        <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
-                    </div>
-                    <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Welcome to EduFlow</h1>
-                    <p className="text-slate-400 dark:text-slate-500 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.3em] mt-1.5">MERN Management Suite</p>
-                </div>
+            <div className="relative z-10 w-full max-w-4xl">
+                <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl dark:shadow-black/40 overflow-hidden flex flex-col lg:flex-row border border-slate-100 dark:border-slate-800/60 min-h-[520px]">
 
-                {/* Glassmorphic Login Card */}
-                <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[2rem] sm:rounded-[2.5rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] p-6 sm:p-8 md:p-10 lg:p-12 border border-slate-100/50 dark:border-slate-800/50">
-                    <div className="mb-6 sm:mb-8 text-center">
-                        <h2 className="text-xl sm:text-2xl font-black text-slate-850 dark:text-white mb-2 tracking-tight">Sign In</h2>
-                        <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium">Please enter your credentials.</p>
-                    </div>
+                    {/* ── Left Brand Panel ── */}
+                    <div className="lg:w-2/5 bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 p-10 md:p-12 text-white flex flex-col justify-between relative overflow-hidden">
+                        {/* Decorative circles */}
+                        <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -mr-36 -mt-36" />
+                        <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/5 rounded-full -ml-28 -mb-28" />
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-2">
-                            <label className="block text-[9px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
-                            <div className="relative group">
-                                <div className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
-                                    <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
-                                </div>
-                                <input
-                                    type="email"
-                                    placeholder="your@email.com"
-                                    className="w-full pl-12 sm:pl-14 pr-4 sm:pr-6 py-3 sm:py-4 bg-slate-50/50 dark:bg-slate-950/30 border-2 border-slate-100 dark:border-slate-800/60 rounded-2xl focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-600 dark:focus:border-indigo-500 outline-none transition-all font-bold text-slate-805 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-700 text-sm"
-                                    value={email}
-                                    onChange={e => setEmail(e.target.value)}
-                                    autoComplete="off"
-                                    required
-                                />
+                        <div className="relative z-10">
+                            {/* Logo */}
+                            <div className="w-14 h-14 bg-white/15 backdrop-blur rounded-2xl flex items-center justify-center mb-8 border border-white/20">
+                                <GraduationCap className="w-7 h-7 text-white" />
                             </div>
+
+                            <h1 className="text-3xl xl:text-4xl font-black mb-3 leading-tight tracking-tight">
+                                Welcome to<br />
+                                <span className="text-indigo-200">EduFlow</span>
+                            </h1>
+                            <p className="text-indigo-200/70 text-sm font-medium leading-relaxed">
+                                Your all-in-one academic management platform. Sign in to access your personalized dashboard.
+                            </p>
                         </div>
 
-                        <div className="space-y-2">
-                            <div className="flex justify-between items-end mr-1">
-                                <label className="block text-[9px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Password</label>
-                                <a href="#" className="text-[9px] sm:text-[10px] font-black text-slate-405 dark:text-slate-500 uppercase tracking-widest hover:text-slate-950 dark:hover:text-white transition-colors">Forgot Pwd?</a>
-                            </div>
-                            <div className="relative group">
-                                <div className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
-                                    <KeyRound className="w-4 h-4 sm:w-5 sm:h-5" />
+                        {/* Feature Points */}
+                        <div className="relative z-10 mt-10 space-y-4">
+                            {[
+                                { icon: BookOpen, text: 'Manage Assignments & Grades' },
+                                { icon: Users, text: 'Connect with Your Classes' },
+                                { icon: Star, text: 'Track Academic Progress' },
+                            ].map((item, idx) => (
+                                <div key={idx} className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
+                                        <item.icon className="w-4 h-4 text-indigo-200" />
+                                    </div>
+                                    <span className="text-indigo-100 text-xs font-semibold">{item.text}</span>
                                 </div>
-                                <input
-                                    type="password"
-                                    placeholder="••••••••••••"
-                                    className="w-full pl-12 sm:pl-14 pr-4 sm:pr-6 py-3 sm:py-4 bg-slate-50/50 dark:bg-slate-950/30 border-2 border-slate-100 dark:border-slate-800/60 rounded-2xl focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-600 dark:focus:border-indigo-500 outline-none transition-all font-bold text-slate-805 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-700 text-sm"
-                                    value={password}
-                                    onChange={e => setPassword(e.target.value)}
-                                    autoComplete="current-password"
-                                    required
-                                />
-                            </div>
+                            ))}
                         </div>
 
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full py-3.5 sm:py-4.5 bg-indigo-600 hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white font-black text-xs sm:text-sm rounded-2xl transition-all shadow-lg shadow-indigo-600/10 dark:shadow-indigo-500/10 hover:shadow-indigo-600/20 dark:hover:shadow-indigo-500/20 flex items-center justify-center gap-2 sm:gap-3 active:scale-[0.98] disabled:opacity-70 group mt-2 cursor-pointer"
-                        >
-                            {isSubmitting ? (
-                                <div className="w-4 h-4 sm:w-5 sm:h-5 border-3 border-white/20 border-t-white rounded-full animate-spin"></div>
-                            ) : (
-                                <>
-                                    <span>Log In</span>
-                                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-                                </>
-                            )}
-                        </button>
-                    </form>
-
-                    <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-100 dark:border-slate-800/60 text-center">
-                        <p className="text-slate-400 dark:text-slate-500 font-bold text-[10px] sm:text-xs tracking-tight">
-                            Don't have an account? <Link to="/register" className="text-indigo-600 dark:text-indigo-450 hover:underline font-black ml-1">Register now</Link>
-                        </p>
+                        <div className="relative z-10 mt-8 pt-6 border-t border-white/10">
+                            <p className="text-indigo-300/60 text-[10px] font-bold uppercase tracking-[0.3em]">MERN MANAGEMENT SUITE · v2.6</p>
+                        </div>
                     </div>
-                </div>
 
-                <div className="mt-6 sm:mt-8 text-center text-slate-300 dark:text-slate-700 text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.5em]">
-                    SECURE ACCESS • v2.6
+                    {/* ── Right Form Panel ── */}
+                    <div className="lg:w-3/5 p-8 md:p-12 flex flex-col justify-center bg-white dark:bg-slate-900">
+                        <div className="max-w-sm mx-auto w-full">
+                            {/* Header */}
+                            <div className="mb-8">
+                                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-1">Sign In</h2>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Please enter your credentials to continue.</p>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="space-y-5">
+                                {/* Email */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
+                                    <div className="relative group">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
+                                            <Mail className="w-4 h-4" />
+                                        </div>
+                                        <input
+                                            type="email"
+                                            id="login-email"
+                                            placeholder="your@email.com"
+                                            className="w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700/60 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 dark:focus:border-indigo-500 outline-none transition-all font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-300 dark:placeholder:text-slate-600 text-sm"
+                                            value={email}
+                                            onChange={e => setEmail(e.target.value)}
+                                            autoComplete="email"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Password */}
+                                <div className="space-y-1.5">
+                                    <div className="flex justify-between items-center ml-1 mr-1">
+                                        <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Password</label>
+                                        <a href="#" className="text-[10px] font-bold text-indigo-500 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">Forgot password?</a>
+                                    </div>
+                                    <div className="relative group">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
+                                            <KeyRound className="w-4 h-4" />
+                                        </div>
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            id="login-password"
+                                            placeholder="••••••••••••"
+                                            className="w-full pl-11 pr-12 py-3.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700/60 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 dark:focus:border-indigo-500 outline-none transition-all font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-300 dark:placeholder:text-slate-600 text-sm"
+                                            value={password}
+                                            onChange={e => setPassword(e.target.value)}
+                                            autoComplete="current-password"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
+                                            tabIndex={-1}
+                                        >
+                                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Submit Button */}
+                                <button
+                                    type="submit"
+                                    id="login-submit"
+                                    disabled={isSubmitting}
+                                    className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm rounded-xl transition-all shadow-lg shadow-indigo-600/20 hover:shadow-indigo-500/30 flex items-center justify-center gap-2.5 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed group mt-2 cursor-pointer"
+                                >
+                                    {isSubmitting ? (
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    ) : (
+                                        <>
+                                            <ShieldCheck className="w-4 h-4" />
+                                            <span>Sign In Securely</span>
+                                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                        </>
+                                    )}
+                                </button>
+                            </form>
+
+                            {/* Footer Link */}
+                            <div className="mt-7 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+                                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
+                                    Don&apos;t have an account?{' '}
+                                    <Link to="/register" className="text-indigo-600 dark:text-indigo-400 font-black hover:underline ml-1">
+                                        Create one now
+                                    </Link>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

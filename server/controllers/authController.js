@@ -18,12 +18,17 @@ const registerUser = async (req, res) => {
         return res.status(400).json({ message: 'Please provide all required fields' });
     }
 
+    // Students must be assigned to a class
+    if (role === 'student' && !classId) {
+        return res.status(400).json({ message: 'Students must select a class to register' });
+    }
+
     try {
         const normalizedEmail = email.toLowerCase();
         const userExists = await User.findOne({ email: normalizedEmail });
 
         if (userExists) {
-            return res.status(400).json({ message: 'User already exists' });
+            return res.status(400).json({ message: 'User already exists with this email' });
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -60,6 +65,10 @@ const registerUser = async (req, res) => {
 // @access  Public
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Please provide email and password' });
+    }
 
     try {
         const user = await User.findOne({ email: email.toLowerCase() });
@@ -126,6 +135,11 @@ const updateProfile = async (req, res) => {
 // @access  Private
 const changePassword = async (req, res) => {
     const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: 'Please provide current and new password' });
+    }
+
     try {
         const user = await User.findById(req.user._id);
 

@@ -11,7 +11,13 @@ import {
     ArrowRight,
     GraduationCap,
     KeyRound,
-    ChevronDown
+    ChevronDown,
+    Eye,
+    EyeOff,
+    ShieldCheck,
+    BookOpen,
+    Users,
+    Star
 } from 'lucide-react';
 
 const Register = () => {
@@ -23,6 +29,7 @@ const Register = () => {
         classId: ''
     });
     const [classes, setClasses] = useState([]);
+    const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { login, user } = useContext(AuthContext);
     const { theme } = useContext(ThemeContext);
@@ -43,7 +50,13 @@ const Register = () => {
         if (formData.role === 'student') {
             fetch(`${API_URL}/classes`)
                 .then(res => res.json())
-                .then(data => setClasses(data))
+                .then(data => {
+                    setClasses(Array.isArray(data) ? data : []);
+                    // Auto-select first class if available
+                    if (Array.isArray(data) && data.length > 0 && !formData.classId) {
+                        setFormData(prev => ({ ...prev, classId: data[0]._id }));
+                    }
+                })
                 .catch(err => console.error(err));
         }
     }, [formData.role, API_URL]);
@@ -60,11 +73,15 @@ const Register = () => {
             const data = await res.json();
             if (res.ok) {
                 login(data);
+                const roleLabel = data.role === 'teacher' ? '👨‍🏫 Teacher' : '🎓 Student';
                 Swal.fire({
                     icon: 'success',
-                    title: 'Welcome aboard!',
-                    text: 'Onboarding sequence initiated.',
-                    timer: 1500,
+                    title: `Welcome, ${data.name}!`,
+                    html: `<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;">
+                        <span style="background:${data.role === 'teacher' ? '#6366f1' : '#10b981'};color:#fff;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:0.05em;">${roleLabel}</span>
+                    </div>
+                    <p style="margin-top:10px;font-size:13px;color:#64748b;">Your account has been created successfully!</p>`,
+                    timer: 2000,
                     showConfirmButton: false,
                     background: theme === 'dark' ? '#0f172a' : '#fff',
                     color: theme === 'dark' ? '#f8fafc' : '#1e293b'
@@ -72,8 +89,8 @@ const Register = () => {
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Onboarding Failed',
-                    text: data.message || 'Validation error.',
+                    title: 'Registration Failed',
+                    text: data.message || 'Validation error. Please check your details.',
                     background: theme === 'dark' ? '#0f172a' : '#fff',
                     color: theme === 'dark' ? '#f8fafc' : '#1e293b'
                 });
@@ -83,7 +100,7 @@ const Register = () => {
             Swal.fire({
                 icon: 'error',
                 title: 'Network Error',
-                text: 'Connection failed.',
+                text: 'Connection failed. Please try again.',
                 background: theme === 'dark' ? '#0f172a' : '#fff',
                 color: theme === 'dark' ? '#f8fafc' : '#1e293b'
             });
@@ -93,151 +110,222 @@ const Register = () => {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-950 relative overflow-hidden font-sans transition-colors duration-300">
+        <div className="min-h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-slate-950 transition-colors duration-300 font-sans p-4 py-8">
 
-            {/* Subtle Gradient Background */}
-            <div className="absolute inset-0 z-0">
-                <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-indigo-50/50 via-white to-blue-50/50 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900"></div>
-                <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-indigo-200/10 dark:bg-indigo-500/5 rounded-full blur-[100px] animate-pulse"></div>
-                <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-200/10 dark:bg-blue-500/5 rounded-full blur-[100px] animate-pulse"></div>
+            {/* Ambient Background */}
+            <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-indigo-400/10 dark:bg-indigo-600/8 rounded-full blur-[120px]" />
+                <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-violet-400/10 dark:bg-violet-600/8 rounded-full blur-[120px]" />
             </div>
 
-            <div className="relative z-10 w-full max-w-[450px] sm:max-w-[500px] py-6 sm:py-10">
-                {/* Branding */}
-                <div className="flex flex-col items-center mb-6 sm:mb-8">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-indigo-600 dark:bg-indigo-500 rounded-2xl flex items-center justify-center shadow-xl mb-3 sm:mb-4 group hover:scale-105 transition-transform duration-300 cursor-pointer">
-                        <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
-                    </div>
-                    <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Join EduFlow</h1>
-                    <p className="text-slate-400 dark:text-slate-500 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.3em] mt-1.5">Create academic profile</p>
-                </div>
+            <div className="relative z-10 w-full max-w-4xl">
+                <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl dark:shadow-black/40 overflow-hidden flex flex-col lg:flex-row border border-slate-100 dark:border-slate-800/60">
 
-                {/* Glassmorphic Register Card */}
-                <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[2rem] sm:rounded-[2.5rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] p-5 sm:p-6 md:p-8 lg:p-12 border border-slate-100/50 dark:border-slate-800/50">
-                    <div className="mb-6 sm:mb-8 text-center">
-                        <h2 className="text-xl sm:text-2xl font-black text-slate-850 dark:text-white mb-2 tracking-tight">Create Profile</h2>
-                        <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium">Join our academic community.</p>
-                    </div>
+                    {/* ── Left Brand Panel ── */}
+                    <div className="lg:w-2/5 bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 p-10 md:p-12 text-white flex flex-col justify-between relative overflow-hidden">
+                        {/* Decorative circles */}
+                        <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -mr-36 -mt-36" />
+                        <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/5 rounded-full -ml-28 -mb-28" />
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                            <div className="space-y-1 sm:space-y-1.5">
-                                <label className="block text-[9px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
-                                <div className="relative group">
-                                    <div className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
-                                        <User className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-                                    </div>
-                                    <input
-                                        type="text"
-                                        placeholder="Kishor Hadiya"
-                                        className="w-full pl-10 sm:pl-11 pr-3 sm:pr-4 py-3 sm:py-3.5 bg-slate-50/50 dark:bg-slate-950/30 border-2 border-slate-100 dark:border-slate-800/60 rounded-2xl focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-600 dark:focus:border-indigo-500 outline-none transition-all font-bold text-slate-800 dark:text-slate-250 placeholder:text-slate-300 dark:placeholder:text-slate-700 text-sm"
-                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                        autoComplete="off"
-                                        required
-                                    />
-                                </div>
+                        <div className="relative z-10">
+                            {/* Logo */}
+                            <div className="w-14 h-14 bg-white/15 backdrop-blur rounded-2xl flex items-center justify-center mb-8 border border-white/20">
+                                <GraduationCap className="w-7 h-7 text-white" />
                             </div>
-                            <div className="space-y-1 sm:space-y-1.5">
-                                <label className="block text-[9px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Portal Role</label>
-                                <div className="relative group">
-                                    <div className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
-                                        <UserCircle className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-                                    </div>
-                                    <select
-                                        className="w-full pl-10 sm:pl-11 pr-8 sm:pr-10 py-3 sm:py-3.5 bg-slate-50/50 dark:bg-slate-950/30 border-2 border-slate-100 dark:border-slate-800/60 rounded-2xl focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-600 dark:focus:border-indigo-500 outline-none transition-all font-black text-slate-700 dark:text-slate-300 appearance-none cursor-pointer uppercase text-[9px] sm:text-[10px] tracking-widest text-sm"
-                                        onChange={e => setFormData({ ...formData, role: e.target.value, classId: '' })}
-                                        value={formData.role}
-                                    >
-                                        <option value="student">Student</option>
-                                        <option value="teacher">Teacher</option>
-                                    </select>
-                                    <ChevronDown className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
-                                </div>
-                            </div>
+
+                            <h1 className="text-3xl xl:text-4xl font-black mb-3 leading-tight tracking-tight">
+                                Join<br />
+                                <span className="text-indigo-200">EduFlow</span>
+                            </h1>
+                            <p className="text-indigo-200/70 text-sm font-medium leading-relaxed">
+                                Create your academic profile and become part of our growing educational community.
+                            </p>
                         </div>
 
-                        <div className="space-y-1 sm:space-y-1.5">
-                            <label className="block text-[9px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Email Identifier</label>
-                            <div className="relative group">
-                                <div className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
-                                    <Mail className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-                                </div>
-                                <input
-                                    type="email"
-                                    placeholder="your@email.com"
-                                    className="w-full pl-10 sm:pl-11 pr-3 sm:pr-4 py-3 sm:py-3.5 bg-slate-50/50 dark:bg-slate-950/30 border-2 border-slate-100 dark:border-slate-800/60 rounded-2xl focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-600 dark:focus:border-indigo-500 outline-none transition-all font-bold text-slate-800 dark:text-slate-250 placeholder:text-slate-300 dark:placeholder:text-slate-700 text-sm"
-                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                    autoComplete="off"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-1 sm:space-y-1.5">
-                            <label className="block text-[9px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Secure Passkey</label>
-                            <div className="relative group">
-                                <div className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
-                                    <KeyRound className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-                                </div>
-                                <input
-                                    type="password"
-                                    placeholder="••••••••••••"
-                                    className="w-full pl-10 sm:pl-11 pr-3 sm:pr-4 py-3 sm:py-3.5 bg-slate-50/50 dark:bg-slate-950/30 border-2 border-slate-100 dark:border-slate-800/60 rounded-2xl focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-600 dark:focus:border-indigo-500 outline-none transition-all font-bold text-slate-805 dark:text-slate-200 placeholder:text-slate-300 dark:placeholder:text-slate-700 text-sm"
-                                    onChange={e => setFormData({ ...formData, password: e.target.value })}
-                                    autoComplete="new-password"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        {formData.role === 'student' && (
-                            <div className="space-y-1 sm:space-y-1.5 animate-in slide-in-from-top-2 duration-300">
-                                <label className="block text-[9px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Class Assignment</label>
-                                <div className="relative group">
-                                    <div className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
-                                        <School className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                        {/* Feature Points */}
+                        <div className="relative z-10 mt-10 space-y-4">
+                            {[
+                                { icon: BookOpen, text: 'Submit & Track Assignments' },
+                                { icon: Users, text: 'Join Academic Classes' },
+                                { icon: Star, text: 'View Grades & Feedback' },
+                            ].map((item, idx) => (
+                                <div key={idx} className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
+                                        <item.icon className="w-4 h-4 text-indigo-200" />
                                     </div>
-                                    <select
-                                        className="w-full pl-10 sm:pl-11 pr-8 sm:pr-10 py-3 sm:py-3.5 bg-slate-50/50 dark:bg-slate-950/30 border-2 border-slate-100 dark:border-slate-800/60 rounded-2xl focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-600 dark:focus:border-indigo-500 outline-none transition-all font-black text-slate-700 dark:text-slate-300 appearance-none cursor-pointer uppercase text-[9px] sm:text-[10px] tracking-widest text-sm"
-                                        onChange={e => setFormData({ ...formData, classId: e.target.value })}
-                                        required
-                                    >
-                                        <option value="">Select Academic Unit</option>
-                                        {classes.map(cls => (
-                                            <option key={cls._id} value={cls._id}>{cls.className}</option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                                    <span className="text-indigo-100 text-xs font-semibold">{item.text}</span>
                                 </div>
-                            </div>
-                        )}
+                            ))}
+                        </div>
 
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full py-3.5 sm:py-4.5 bg-indigo-600 hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white font-black text-xs sm:text-sm rounded-2xl transition-all shadow-lg shadow-indigo-600/10 dark:shadow-indigo-500/10 hover:shadow-indigo-600/20 dark:hover:shadow-indigo-500/20 flex items-center justify-center gap-2 sm:gap-3 active:scale-[0.98] disabled:opacity-70 group mt-3 sm:mt-4 cursor-pointer"
-                        >
-                            {isSubmitting ? (
-                                <div className="w-4 h-4 sm:w-5 sm:h-5 border-3 border-white/20 border-t-white rounded-full animate-spin"></div>
-                            ) : (
-                                <>
-                                    <span>Initialize Account</span>
-                                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-                                </>
-                            )}
-                        </button>
-                    </form>
-
-                    <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-100 dark:border-slate-800/60 text-center">
-                        <p className="text-slate-400 dark:text-slate-500 font-bold text-[10px] sm:text-xs tracking-tight">
-                            Already a member? <Link to="/login" className="text-indigo-600 dark:text-indigo-450 hover:underline font-black ml-1">Log in here</Link>
-                        </p>
+                        <div className="relative z-10 mt-8 pt-6 border-t border-white/10">
+                            <p className="text-indigo-300/60 text-[10px] font-bold uppercase tracking-[0.3em]">SECURE REGISTRATION · v2.6</p>
+                        </div>
                     </div>
-                </div>
 
-                <div className="mt-6 sm:mt-8 text-center text-slate-300 dark:text-slate-700 text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.5em]">
-                    SECURE REGISTRATION • v2.6
+                    {/* ── Right Form Panel ── */}
+                    <div className="lg:w-3/5 p-8 md:p-12 flex flex-col justify-center bg-white dark:bg-slate-900">
+                        <div className="max-w-sm mx-auto w-full">
+                            {/* Header */}
+                            <div className="mb-7">
+                                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-1">Create Account</h2>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Fill in your details to get started.</p>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="space-y-4">
+
+                                {/* Name + Role Row */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {/* Full Name */}
+                                    <div className="space-y-1.5">
+                                        <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
+                                        <div className="relative group">
+                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
+                                                <User className="w-4 h-4" />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                id="register-name"
+                                                placeholder="Your Full Name"
+                                                className="w-full pl-11 pr-3 py-3.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700/60 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 dark:focus:border-indigo-500 outline-none transition-all font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-300 dark:placeholder:text-slate-600 text-sm"
+                                                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                                autoComplete="off"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Portal Role */}
+                                    <div className="space-y-1.5">
+                                        <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Portal Role</label>
+                                        <div className="relative group">
+                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
+                                                <UserCircle className="w-4 h-4" />
+                                            </div>
+                                            <select
+                                                id="register-role"
+                                                className="w-full pl-11 pr-9 py-3.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700/60 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 dark:focus:border-indigo-500 outline-none transition-all font-bold text-slate-800 dark:text-slate-100 appearance-none cursor-pointer text-sm"
+                                                onChange={e => setFormData({ ...formData, role: e.target.value, classId: '' })}
+                                                value={formData.role}
+                                            >
+                                                <option value="student">🎓 Student</option>
+                                                <option value="teacher">👨‍🏫 Teacher</option>
+                                            </select>
+                                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Email */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
+                                    <div className="relative group">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
+                                            <Mail className="w-4 h-4" />
+                                        </div>
+                                        <input
+                                            type="email"
+                                            id="register-email"
+                                            placeholder="your@email.com"
+                                            className="w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700/60 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 dark:focus:border-indigo-500 outline-none transition-all font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-300 dark:placeholder:text-slate-600 text-sm"
+                                            onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                            autoComplete="off"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Password */}
+                                <div className="space-y-1.5">
+                                    <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Password</label>
+                                    <div className="relative group">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
+                                            <KeyRound className="w-4 h-4" />
+                                        </div>
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            id="register-password"
+                                            placeholder="Min. 6 characters"
+                                            className="w-full pl-11 pr-12 py-3.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700/60 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 dark:focus:border-indigo-500 outline-none transition-all font-semibold text-slate-800 dark:text-slate-100 placeholder:text-slate-300 dark:placeholder:text-slate-600 text-sm"
+                                            onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                            autoComplete="new-password"
+                                            minLength={6}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
+                                            tabIndex={-1}
+                                        >
+                                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Class Assignment — Student Only */}
+                                {formData.role === 'student' && (
+                                    <div className="space-y-1.5 animate-in slide-in-from-top-2 duration-200">
+                                        <label className="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">
+                                            Class Assignment
+                                            <span className="ml-2 text-indigo-500 normal-case font-semibold tracking-normal">(required)</span>
+                                        </label>
+                                        <div className="relative group">
+                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
+                                                <School className="w-4 h-4" />
+                                            </div>
+                                            <select
+                                                id="register-class"
+                                                className="w-full pl-11 pr-9 py-3.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700/60 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500 dark:focus:border-indigo-500 outline-none transition-all font-semibold text-slate-800 dark:text-slate-100 appearance-none cursor-pointer text-sm"
+                                                onChange={e => setFormData({ ...formData, classId: e.target.value })}
+                                                value={formData.classId}
+                                                required
+                                            >
+                                                <option value="">Select Academic Unit</option>
+                                                {classes.map(cls => (
+                                                    <option key={cls._id} value={cls._id}>{cls.className}</option>
+                                                ))}
+                                            </select>
+                                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                                        </div>
+                                        {classes.length === 0 && (
+                                            <p className="text-xs text-amber-500 dark:text-amber-400 ml-1 mt-1">
+                                                ⚠️ Loading classes... If empty, contact your teacher.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Submit Button */}
+                                <button
+                                    type="submit"
+                                    id="register-submit"
+                                    disabled={isSubmitting}
+                                    className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm rounded-xl transition-all shadow-lg shadow-indigo-600/20 hover:shadow-indigo-500/30 flex items-center justify-center gap-2.5 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed group mt-3 cursor-pointer"
+                                >
+                                    {isSubmitting ? (
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    ) : (
+                                        <>
+                                            <ShieldCheck className="w-4 h-4" />
+                                            <span>Create Account</span>
+                                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                        </>
+                                    )}
+                                </button>
+                            </form>
+
+                            {/* Footer Link */}
+                            <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 text-center">
+                                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
+                                    Already a member?{' '}
+                                    <Link to="/login" className="text-indigo-600 dark:text-indigo-400 font-black hover:underline ml-1">
+                                        Sign in here
+                                    </Link>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
