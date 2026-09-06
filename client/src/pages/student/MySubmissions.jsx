@@ -115,10 +115,10 @@ const MySubmissions = () => {
                 ) : (
                     <div className="space-y-6">
                         {submissions.map(sub => (
-                            <div key={sub._id} className="group bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 md:p-8 shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 dark:border-slate-805/50 flex flex-col xl:flex-row gap-8 relative overflow-hidden">
+                            <div key={sub._id} className="group bg-white dark:bg-slate-900 rounded-[2.5rem] p-5 md:p-8 shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 dark:border-slate-800/50 flex flex-col lg:flex-row gap-6 md:gap-8 relative overflow-hidden">
 
                                 {/* Left: Assignment Info */}
-                                <div className="flex-1 flex flex-col justify-center border-l-4 border-indigo-600 pl-6">
+                                <div className="flex-1 flex flex-col justify-center border-l-4 border-indigo-600 pl-4 md:pl-6">
                                     <div className="flex items-center gap-3 mb-3">
                                         <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${sub.status === 'reviewed' ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400' : 'bg-amber-50 dark:bg-amber-955/30 text-amber-605 dark:text-amber-400'}`}>
                                             {sub.status === 'reviewed' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
@@ -142,7 +142,7 @@ const MySubmissions = () => {
                                 </div>
 
                                 {/* Center: Grading & Feedback */}
-                                <div className="xl:w-2/5 p-6 bg-slate-50 dark:bg-slate-955/30 rounded-3xl border border-slate-100 dark:border-slate-800/80 flex flex-col md:flex-row items-center gap-8 group-hover:bg-indigo-50/50 dark:group-hover:bg-indigo-950/10 transition-all">
+                                <div className="lg:w-2/5 p-4 md:p-6 bg-slate-50 dark:bg-slate-900/30 rounded-3xl border border-slate-100 dark:border-slate-800/80 flex flex-row items-center gap-4 md:gap-8 group-hover:bg-indigo-50/50 dark:group-hover:bg-indigo-950/10 transition-all">
                                     <div className="text-center">
                                         <div className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 leading-none">Grade</div>
                                         <div className={`text-4xl font-black ${sub.marks ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-300 dark:text-slate-700'}`}>
@@ -150,8 +150,8 @@ const MySubmissions = () => {
                                             <span className="text-xs text-slate-400 dark:text-slate-500 ml-1 font-bold">/ 100</span>
                                         </div>
                                     </div>
-                                    <div className="flex-1 border-l border-slate-205 dark:border-slate-800/80 pl-8 text-center md:text-left">
-                                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 justify-center md:justify-start">
+                                    <div className="flex-1 border-l border-slate-200 dark:border-slate-800/80 pl-4 md:pl-8 text-left">
+                                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-2 justify-start">
                                             <MessageSquare className="w-3.5 h-3.5 text-indigo-400" /> Faculty Insights
                                         </div>
                                         <p className="text-sm font-bold text-slate-605 dark:text-slate-400 italic line-clamp-2">
@@ -161,7 +161,7 @@ const MySubmissions = () => {
                                 </div>
 
                                 {/* Right: Actions */}
-                                <div className="flex items-center justify-center pt-4 md:pt-0">
+                                <div className="flex items-center justify-center lg:justify-end">
                                     <button
                                         onClick={() => handleDelete(sub._id)}
                                         className="p-4 bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-slate-400 hover:text-rose-500 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-rose-100 dark:hover:border-rose-900/30 transition-all shadow-sm active:scale-95 group/del cursor-pointer"

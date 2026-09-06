@@ -20,6 +20,23 @@ export default defineConfig(({ mode }) => {
     ],
     define: {
       'import.meta.env.VITE_API_URL': JSON.stringify(apiUrl)
+    },
+    build: {
+      // Increase warning threshold to avoid noise (953KB is a warning, not an error)
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          // Code split vendors to improve load times and caching
+          manualChunks: {
+            // React core
+            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+            // Charts library (largest dependency)
+            'recharts-vendor': ['recharts'],
+            // UI libraries
+            'ui-vendor': ['lucide-react', 'sweetalert2'],
+          }
+        }
+      }
     }
   };
 })

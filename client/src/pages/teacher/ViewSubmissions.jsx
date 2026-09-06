@@ -276,10 +276,10 @@ const ViewSubmissions = () => {
                                 {filteredSubmissions.map(sub => (
                                     <div key={sub._id} className="group bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 shadow-sm hover:shadow-md transition-all border border-slate-100 dark:border-slate-805/50 relative overflow-hidden">
 
-                                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 items-start">
 
                                             {/* Candidate Info */}
-                                            <div className="lg:col-span-3 flex items-center gap-4">
+                                            <div className="lg:col-span-3 flex items-center gap-3 md:gap-4">
                                                 <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-650 dark:text-indigo-400 flex items-center justify-center font-black text-xl border border-indigo-100 dark:border-indigo-900/30 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-inner">
                                                     {sub.studentId?.name.charAt(0)}
                                                 </div>
@@ -311,7 +311,7 @@ const ViewSubmissions = () => {
                                             </div>
 
                                             {/* Grading Forms */}
-                                            <div className="lg:col-span-6 flex flex-col sm:flex-row items-end gap-4 bg-slate-50/50 dark:bg-slate-950/30 p-4 rounded-3xl group-hover:bg-indigo-50/10 dark:group-hover:bg-indigo-950/10 transition-all border border-transparent group-hover:border-indigo-100/30 dark:group-hover:border-indigo-900/30">
+                                            <div className="lg:col-span-6 flex flex-col sm:flex-row items-end gap-3 bg-slate-50/50 dark:bg-slate-950/30 p-4 rounded-3xl group-hover:bg-indigo-50/10 dark:group-hover:bg-indigo-950/10 transition-all border border-transparent group-hover:border-indigo-100/30 dark:group-hover:border-indigo-900/30">
                                                 <div className="w-full sm:w-28">
                                                     <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block ml-1">Score (100)</label>
                                                     <input
@@ -334,7 +334,7 @@ const ViewSubmissions = () => {
                                                 </div>
                                                 <button
                                                     onClick={() => handleEvaluate(sub._id)}
-                                                    className="w-full sm:w-auto px-5 py-3 bg-slate-950 dark:bg-white text-white dark:text-slate-950 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 font-black text-xs uppercase tracking-widest shrink-0 cursor-pointer"
+                                                    className="w-full sm:w-auto px-5 py-3 bg-slate-950 dark:bg-white text-white dark:text-slate-950 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 font-black text-xs uppercase tracking-widest shrink-0 cursor-pointer hover:bg-indigo-600 dark:hover:bg-indigo-500 dark:hover:text-white"
                                                 >
                                                     <Save className="w-4 h-4" /> Save
                                                 </button>
